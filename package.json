@@ -1,0 +1,14 @@
+{
+  "name": "graphql-tutorial",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm start"
+  },
+  "author": "Deb Johnson",
+  "license": "ISC",
+  "dependencies": {
+    "graphql": "^14.0.2"
+  }
+}
