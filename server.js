@@ -3,26 +3,38 @@ var graphqlHTTP = require('express-graphql');
 var { buildSchema } = require('graphql');
 
 var schema = buildSchema(`
+    type RandomDie {
+        numSides: Int!
+        rollOnce: Int!
+        roll(numRolls: Int!): [Int]
+    }
+
     type Query {
-        quoteOfTheDay: String
-        random: Float!
-        rollDice(numDice: Int!, numSides: Int): [Int]
+        getDie(numSides: Int): RandomDie
     }
 `);
 
-var root = {
-    quoteOfTheDay: () => {
-        return Math.random() < 0.5 ? 'Take it easy' : 'Salvation comes from Jesus';
-    },
-    random: () => {
-        return Math.random();
-    },
-    rollDice: function ( {numDice, numSides}) {
+class RandomDie {
+    constructor(numSides) {
+        this.numSides = numSides;
+    }
+
+    rollOnce() {
+        return 1 + Math.floor(Math.random() * this.numSides);
+    }
+
+    roll({numRolls}) {
         var output = [];
-        for (var i = 0; i < numDice; i++) {
-            output.push(1 + Math.floor(Math.random() * (numSides || 6)));
+        for (var i = 0; i < numRolls; i++) {
+            output.push(this.rollOnce());
         }
         return output;
+    }
+}
+
+var root = {
+    getDie: function ( {numSides}) {
+        return new RandomDie(numSides || 6);
     }
 };
 
@@ -34,7 +46,3 @@ app.use('/graphql', graphqlHTTP({
 }));
 app.listen(4000);
 console.log('Running a GraphQL APU server at localhost:4000/graphql');
-
-// graphql(schema, '{ hello }', root).then((response) => {
-//     console.log(response);
-// });
